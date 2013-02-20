@@ -1,10 +1,27 @@
 sys = require 'sys'
 my_http = require 'http'
-redis = require 'redis'
+
+options = {
+	'help' : { description: 'Show this message', boolean:true, alias: 'h' },
+	'port' : { description: 'Port to listen on',  alias: 'p', default: 6502 }
+}
+
+optimist = require('optimist')
+argv = optimist.usage('Usage: $0 [--help]', options).argv
+
+if argv.help
+	sys.puts optimist.help()
+	process.exit(1)
+
+
+# Let's get started
+
+# Interface to redis
 
 class KvStore
 	constructor: () ->
-		@client = redis.createClient()
+		@redis = require 'redis'
+		@client = @redis.createClient()
 
 	set: (_key, _value) ->
 		@client.set _key, _value
@@ -17,6 +34,8 @@ kvstore = new KvStore()
 # Ive not programmed in this way before - starting to understand
 # the upside of functional coding and lamdas hiding a lot
 # of concurrency nonsense
+
+sys.puts "Server starting on  " + argv.port
 
 my_http.createServer (req, res )->
 
@@ -51,6 +70,8 @@ my_http.createServer (req, res )->
 		else
 			respond 'UNHANDLED METHOD'
 
-.listen 6502
+.listen argv.port
 
-sys.puts "Server is running on port 6502"
+
+
+
