@@ -7,30 +7,33 @@ namespace Examples.System.Net
 {
     public class WebRequestPostExample
     {
+        public static String getResponse(WebResponse response)
+        {
+            // Get the stream containing content returned by the server.
+            
+            Stream dataStream = response.GetResponseStream ();
+
+            String responseFromServer = (new StreamReader (dataStream)).ReadToEnd ();
+            dataStream.Close ();
+            return responseFromServer;
+        }
+
         public static string get (string _var)
         {
             // Create a request using a URL that can receive a post. 
             WebRequest request = WebRequest.Create ("http://localhost:6502/" + _var);
+
             // Set the Method property of the request to POST.
             request.Method = "GET";
             request.ContentType = "text/plain";
-            // Set the ContentLength property of the WebRequest.
 
             WebResponse response = request.GetResponse ();
-            // Display the status.
+
             Console.WriteLine (((HttpWebResponse)response).StatusDescription);
-            
-            // Get the stream containing content returned by the server.
-            Stream dataStream = response.GetResponseStream ();
-            StreamReader reader = new StreamReader (dataStream);
-            string responseFromServer = reader.ReadToEnd ();
+            String responseFromServer = getResponse(response);
 
-            
             // Clean up the streams.
-            reader.Close ();
-            dataStream.Close ();
             response.Close ();
-
             return responseFromServer;
         }
 
@@ -50,13 +53,7 @@ namespace Examples.System.Net
             dataStream.Close ();
 
             WebResponse response = request.GetResponse ();
-            Console.WriteLine (((HttpWebResponse)response).StatusDescription);
-            dataStream = response.GetResponseStream ();
-            StreamReader reader = new StreamReader (dataStream);
-            string responseFromServer = reader.ReadToEnd ();
-
-            reader.Close ();
-            dataStream.Close ();
+            String responseFromServer = getResponse(response);
             response.Close ();
 
             return responseFromServer;
